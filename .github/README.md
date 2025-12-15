@@ -1,101 +1,107 @@
-GitHub Activity Generator [![Gitter](https://badges.gitter.im/github-activity-generator/community.svg)](https://gitter.im/github-activity-generator/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) [![build](https://github.com/Shpota/github-activity-generator/workflows/build/badge.svg)](https://github.com/Shpota/github-activity-generator/actions?query=workflow%3Abuild)
-=========================
+# GitHub Activity Generator (Fast Fork)
 
-A script that helps you *instantly* generate a beautiful GitHub Contributions Graph
-for the last year.
+[![build](https://github.com/jhonny1994/github-activity-generator/workflows/build/badge.svg)](https://github.com/jhonny1994/github-activity-generator/actions?query=workflow%3Abuild)
+
+A **performance-optimized fork** of [Shpota/github-activity-generator](https://github.com/Shpota/github-activity-generator) that generates a beautiful GitHub Contributions Graph **2-3x faster** using git fast-import.
 
 ## ⚠ Disclaimer
 
 This script is for educational purposes and demonstrating GitHub mechanics. It should not be used to misrepresent professional contributions or coding activity.
 
-## Check my other projects
+## What's New in This Fork
 
-I created this project more than five years ago. Since then, I have built several **much more valuable
-tools** which I encourage you to check:
-
-- [sol4k](https://github.com/sol4k/sol4k) - Kotlin, JVM, and Android client for Solana
-- [podil.js](https://github.com/podiljs/podil) - Lightweight and secure database schema migration tool
-- [goxygen](https://github.com/Shpota/goxygen) - Web project generator
-- [zeit](https://github.com/Shpota/zeit) - A Fitbit clock face for learners of the German language
-
+| Feature | Original | This Fork |
+|---------|----------|-----------|
+| **Speed** | ~60s for 1 year | ~20s for 1 year |
+| **Force push** | ❌ | ✅ `--force` |
+| **Append mode** | ❌ | ✅ `--append` |
+| **Clean README** | Accumulated text | Simple description |
 
 ## What it looks like
 
-### Before :neutral_face: :no_mouth: :unamused: 
+### Before 😐
 ![Before](before.png)
-### After :muscle: :relieved: :heart: :sunglasses: :metal: :horse: :wink: :fire: :dancer: :santa: :fireworks: :cherries: :tada:
+### After 💪 🔥
 ![After](after.png)
 
-## How to use
-1. Create an empty GitHub repository. Do not initialize it.
-2. Download [the contribute.py script](https://github.com/Shpota/github-activity-generator/archive/master.zip) 
-and execute it passing the link on the created repository
-```sh
+## Quick Start
+
+```bash
+# Create an empty GitHub repository (DO NOT initialize it)
+# Then run:
 python contribute.py --repository=git@github.com:user/repo.git
 ```
-Now you have a repository with lots of changes in your GitHub account.
-Note: it takes several minutes for GitHub to reindex your activity.
 
-## How it works
-The script initializes an empty git repository, creates a text file and starts 
-generating changes to the file for every day within the last year (0-20 commits 
-per day). Once the commits are generated it links the created repository with
-the remote repository and pushes the changes.
+## Usage Examples
 
-## Customizations
-You can customize how often to commit and how many commits a day to make, etc.
-
-For instance, with the following command, the script will make from 1 to 12 
-commits a day. It will commit 60% days a year.
-```sh
-python contribute.py --max_commits=12 --frequency=60 --repository=git@github.com:user/repo.git
-```
-Use `--no_weekends` option if you don't want to commit on weekends
-```sh
-python contribute.py --no_weekends
-```
-If you do not set the `--repository` argument the script won't push the changes. 
-This way you can import the generated repository yourself.
-
-Use `--days_before` and `--days_after` to specify how many days before the current
-date the script should start committing, and how many days after the current date it
-will keep committing.
-
-```sh
-python contribute.py --days_before=10 --days_after=15
+### Basic (1 year of contributions)
+```bash
+python contribute.py -r git@github.com:user/repo.git
 ```
 
-Run `python contribute.py --help` to get help.
+### Human-like pattern (weekdays only, moderate activity)
+```bash
+python contribute.py -r git@github.com:user/repo.git -nw -fr=70 -mc=5
+```
 
-## System requirements
-To be able to execute the script you need to have Python and Git installed.
+### Fill 5 years of history
+```bash
+python contribute.py -r git@github.com:user/repo.git -db=1825 --force
+```
+
+### Add to existing repo (preserves files)
+```bash
+python contribute.py -r git@github.com:user/repo.git --append
+```
+
+## All Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-r, --repository` | Remote repository URL | None |
+| `-nw, --no_weekends` | Skip weekends | False |
+| `-mc, --max_commits` | Max commits per day (1-20) | 10 |
+| `-fr, --frequency` | % of days to commit (0-100) | 80 |
+| `-db, --days_before` | Days before today | 365 |
+| `-da, --days_after` | Days after today | 0 |
+| `-un, --user_name` | Override git user.name | Global config |
+| `-ue, --user_email` | Override git user.email | Global config |
+| `-f, --force` | Force push (overwrite remote) | False |
+| `-a, --append` | Clone first, preserve files | False |
+
+```bash
+python contribute.py --help
+```
+
+## System Requirements
+
+- Python 3.10+
+- Git
 
 ## Troubleshooting
 
-#### I performed the script but my GitHub activity is still the same.
-It might take several minutes for GitHub to reindex your activity. Check
-if the repository has new commits and wait a couple of minutes.
-#### The changes are still not reflected after some time.
-Are you using a private repository? If so, enable showing private contributions
-[following this guide](https://help.github.com/en/articles/publicizing-or-hiding-your-private-contributions-on-your-profile).
+### Activity not showing?
+1. Wait a few minutes for GitHub to reindex
+2. Enable private contributions if using a private repo
+3. Verify your email matches GitHub settings:
+   ```bash
+   git config --get user.email
+   ```
 
-#### Still no luck
-Make sure the email address you have in GitHub is the same as you have in
-your local settings. GitHub counts contributions only when they are made 
-using the corresponding email.
+### Push rejected?
+Use `--force` to overwrite existing history:
+```bash
+python contribute.py -r git@github.com:user/repo.git --force
+```
 
-Check your local email settings with:
+### Want to preserve existing files?
+Use `--append` to clone first:
+```bash
+python contribute.py -r git@github.com:user/repo.git --append
 ```
-git config --get user.email
-```
-If it doesn't match with the one from GitHub reset it with
-```
-git config --global user.email "user@example.com"
-```
-Create a new repository and rerun the script.
 
-#### There are errors in the logs of the script.
-Maybe you tried to use an existing repository. If so, make sure you are using
-a new one which is *not initialized*.
+## Credits
 
-**If none of the options helped, open an issue and I will fix it as soon as possible.**
+Original project by [Shpota](https://github.com/Shpota/github-activity-generator)
+
+Performance optimization using git fast-import.
